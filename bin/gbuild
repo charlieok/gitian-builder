@@ -306,15 +306,24 @@ base_manifests = YAML::Omap.new
 
 suites.each do |suite|
   suite = sanitize(suite, "suite")
+
+  suite_dir = "#{build_dir}/#{suite}"
+  FileUtils.rm_rf(suite_dir)
+  FileUtils.mkdir(suite_dir)
+
   archs.each do |arch|
     info "--- Building for #{suite} #{arch} ---"
     arch = sanitize(arch, "architecture")
+
+    arch_dir = "#{suite_dir}/#{arch}"
+    FileUtils.rm_rf(arch_dir)
+    FileUtils.mkdir(arch_dir)
 
     # Build!
     build_one_configuration(suite, arch, build_desc)
 
     info "Grabbing results from target"
-    system! "copy-from-target #{@quiet_flag} out #{build_dir}"
+    system! "copy-from-target #{@quiet_flag} out #{arch_dir}"
 
     if enable_cache && !@options[:cache_ro]
       info "Grabbing cache from target"
